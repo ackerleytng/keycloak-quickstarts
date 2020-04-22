@@ -56,8 +56,8 @@
       }
     },
     {
-      "name": "Only From @keycloak.org or Admin",
-      "description": "Defines that only users from @keycloak.org or Admins can do something",
+      "name": "Only From a Specific Client Address",
+      "description": "Defines that only clients from a specific address can do something",
       "type": "script-only-from-specific-client-address.js",
       "logic": "POSITIVE",
       "decisionStrategy": "UNANIMOUS"
@@ -80,8 +80,8 @@
       }
     },
     {
-      "name": "Only From a Specific Client Address",
-      "description": "Defines that only clients from a specific address can do something",
+      "name": "Only From @keycloak.org or Admin",
+      "description": "Defines that only users from @keycloak.org or Admins can do something",
       "type": "script-only-keycloak-domain-or-admin.js",
       "logic": "POSITIVE",
       "decisionStrategy": "UNANIMOUS"
