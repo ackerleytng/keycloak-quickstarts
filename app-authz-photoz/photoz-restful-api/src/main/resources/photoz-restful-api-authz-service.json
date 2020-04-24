@@ -3,8 +3,14 @@
   "policyEnforcementMode": "ENFORCING",
   "resources": [
     {
-      "name": "Admin Resource",
-      "uri": "/admin/*",
+      "name": "/admin/album",
+      "ownerManagedAccess": false,
+      "displayName": "/admin/album",
+      "attributes": {},
+      "_id": "34651139-7e6d-494d-bdf5-3276bbbac326",
+      "uris": [
+        "/admin/album"
+      ],
       "scopes": [
         {
           "name": "admin:manage"
@@ -12,124 +18,181 @@
       ]
     },
     {
-      "name": "Default Resource",
-      "uri": "/*",
+      "name": "/album/{id}",
+      "ownerManagedAccess": false,
+      "displayName": "/album/{id}",
+      "attributes": {},
+      "_id": "2bacc402-bf1f-427d-aab8-2f0edcb4064d",
+      "uris": [
+        "/album/{id}"
+      ],
       "scopes": [
         {
-          "name": "profile:view"
+          "name": "album:view"
+        },
+        {
+          "name": "album:delete"
         }
       ]
     },
     {
-      "name": "Album Resource",
-      "uri": "/album/{id}",
-      "type": "http://photoz.com/album",
+      "name": "/album",
+      "ownerManagedAccess": false,
+      "displayName": "/album",
+      "attributes": {},
+      "_id": "b45d7d5b-76aa-4f2b-a4c9-431e1dbd5f7a",
+      "uris": [
+        "/album"
+      ],
       "scopes": [
         {
-          "name": "album:delete"
-        },
+          "name": "photoz:user"
+        }
+      ]
+    },
+    {
+      "name": "/profile",
+      "ownerManagedAccess": false,
+      "displayName": "/profile",
+      "attributes": {},
+      "_id": "9a558024-8fd2-4e28-a41f-949b85c46614",
+      "uris": [
+        "/profile"
+      ],
+      "scopes": [
         {
-          "name": "album:view"
+          "name": "photoz:user"
+        }
+      ]
+    },
+    {
+      "name": "/album/shares",
+      "ownerManagedAccess": false,
+      "displayName": "/album/shares",
+      "attributes": {},
+      "_id": "4f300cd1-bdee-41d1-b1ed-4fab95bb8a36",
+      "uris": [
+        "/album/shares"
+      ],
+      "scopes": [
+        {
+          "name": "photoz:user"
         }
       ]
     }
   ],
   "policies": [
     {
-      "name": "Only Owner and Administrators Policy",
-      "description": "Defines that only the resource owner and administrators can do something",
-      "type": "aggregate",
-      "logic": "POSITIVE",
-      "decisionStrategy": "AFFIRMATIVE",
-      "config": {
-        "applyPolicies": "[\"Administration Policy\",\"Only Owner Policy\"]"
-      }
-    },
-    {
-      "name": "Administration Policy",
-      "description": "Defines that only administrators from a specific network address can do something.",
-      "type": "aggregate",
-      "logic": "POSITIVE",
-      "decisionStrategy": "UNANIMOUS",
-      "config": {
-        "applyPolicies": "[\"Any Admin Policy\",\"Only From a Specific Client Address\"]"
-      }
-    },
-    {
-      "name": "Only From a Specific Client Address",
-      "description": "Defines that only clients from a specific address can do something",
-      "type": "script-only-from-specific-client-address.js",
-      "logic": "POSITIVE",
-      "decisionStrategy": "UNANIMOUS"
-    },
-    {
-      "name": "Only Owner Policy",
-      "description": "Defines that only the resource owner is allowed to do something",
-      "type": "script-only-owner.js",
-      "logic": "POSITIVE",
-      "decisionStrategy": "UNANIMOUS"
-    },
-    {
-      "name": "Any Admin Policy",
-      "description": "Defines that adminsitrators can do something",
-      "type": "role",
-      "logic": "POSITIVE",
-      "decisionStrategy": "UNANIMOUS",
-      "config": {
-        "roles": "[{\"id\":\"admin\",\"required\":true}]"
-      }
-    },
-    {
+      "id": "78ada6b0-698b-4d9a-b71d-62d8302d3e0c",
       "name": "Only From @keycloak.org or Admin",
       "description": "Defines that only users from @keycloak.org or Admins can do something",
       "type": "script-only-keycloak-domain-or-admin.js",
       "logic": "POSITIVE",
-      "decisionStrategy": "UNANIMOUS"
+      "decisionStrategy": "UNANIMOUS",
+      "config": {}
     },
     {
-      "name": "Any User Policy",
-      "description": "Defines that only users from well known clients are allowed to access",
+      "id": "16440979-1602-41f4-9180-42b1ade68276",
+      "name": "Only Owner Policy",
+      "description": "Defines that only the resource owner is allowed to do something",
+      "type": "script-only-owner.js",
+      "logic": "POSITIVE",
+      "decisionStrategy": "UNANIMOUS",
+      "config": {}
+    },
+    {
+      "id": "5e2b8c3d-8b9a-41a9-a3c6-a1359d639e2d",
+      "name": "Only From a Specific Client Address",
+      "description": "Defines that only clients from a specific address can do something",
+      "type": "script-only-from-specific-client-address.js",
+      "logic": "POSITIVE",
+      "decisionStrategy": "UNANIMOUS",
+      "config": {}
+    },
+    {
+      "id": "7a2fa4ac-55dc-4661-8de2-f676c4386100",
+      "name": "Realm Administrator Policy",
+      "description": "Defines that someone is only allowed to do something if they are an admin in this realm",
       "type": "role",
       "logic": "POSITIVE",
       "decisionStrategy": "UNANIMOUS",
       "config": {
-        "roles": "[{\"id\":\"user\",\"required\":false},{\"id\":\"photoz-restful-api/manage-albums\",\"required\":true}]"
+        "roles": "[{\"id\":\"admin\",\"required\":false}]"
       }
     },
     {
-      "name": "Admin Resource Permission",
-      "description": "General policy for any administrative resource.",
-      "type": "resource",
+      "id": "1ffe1efa-c436-4d7b-a604-dba2117326fc",
+      "name": "Administrator Policy",
+      "description": "Defines that someone is only allowed to do something if they are an admin in this realm accessing the system from localhost",
+      "type": "aggregate",
       "logic": "POSITIVE",
       "decisionStrategy": "UNANIMOUS",
       "config": {
-        "resources": "[\"Admin Resource\"]",
-        "applyPolicies": "[\"Administration Policy\"]",
-        "default": "true"
+        "applyPolicies": "[\"Only From a Specific Client Address\",\"Realm Administrator Policy\"]"
       }
     },
     {
-      "name": "Album Resource Permission",
-      "description": "A default permission that defines access for any album resource",
+      "id": "db59a9ce-9d3a-4272-af14-bbe8caab57bb",
+      "name": "Owner or Administrator Policy",
+      "description": "Defines that someone is only allowed to do something if they are an admin in this realm or owner of this resource",
+      "type": "aggregate",
+      "logic": "POSITIVE",
+      "decisionStrategy": "AFFIRMATIVE",
+      "config": {
+        "applyPolicies": "[\"Administrator Policy\",\"Only Owner Policy\"]"
+      }
+    },
+    {
+      "id": "9d2ab867-3382-472e-80ba-0914d4f96bf4",
+      "name": "Grant album:* if user is owner or admin",
       "type": "scope",
       "logic": "POSITIVE",
       "decisionStrategy": "UNANIMOUS",
       "config": {
-        "defaultResourceType": "[\"http://photoz.com/album\"]",
         "scopes": "[\"album:view\",\"album:delete\"]",
-        "applyPolicies": "[\"Only Owner and Administrators Policy\"]"
+        "applyPolicies": "[\"Owner or Administrator Policy\"]"
       }
     },
     {
-      "name": "Default Resource Permission",
-      "description": "Defines who is allowed to view common resources",
-      "type": "resource",
+      "id": "b944b709-47f8-4d33-af05-768e3455a578",
+      "name": "Grant admin:manage if user is admin",
+      "type": "scope",
       "logic": "POSITIVE",
       "decisionStrategy": "UNANIMOUS",
       "config": {
-        "resources": "[\"Default Resource\"]",
+        "scopes": "[\"admin:manage\"]",
+        "applyPolicies": "[\"Administrator Policy\"]"
+      }
+    },
+    {
+      "id": "db902318-c5f0-49a8-b13d-648eb507857e",
+      "name": "Grant photoz:user if user is from @keycloak.org or admin",
+      "type": "scope",
+      "logic": "POSITIVE",
+      "decisionStrategy": "UNANIMOUS",
+      "config": {
+        "scopes": "[\"photoz:user\"]",
         "applyPolicies": "[\"Only From @keycloak.org or Admin\"]"
       }
     }
-  ]
+  ],
+  "scopes": [
+    {
+      "id": "3811707b-52cd-42e8-aa14-52b4a8406c0b",
+      "name": "admin:manage"
+    },
+    {
+      "id": "17fa4aa0-30d8-4f31-8b9e-3f304269bedf",
+      "name": "album:view"
+    },
+    {
+      "id": "300274d9-238b-488f-a564-00a39ee285c0",
+      "name": "album:delete"
+    },
+    {
+      "id": "bb0d6ac7-7ddc-4099-96e1-3f8422f18a0f",
+      "name": "photoz:user"
+    }
+  ],
+  "decisionStrategy": "UNANIMOUS"
 }
