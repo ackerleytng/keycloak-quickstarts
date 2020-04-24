@@ -231,3 +231,26 @@ Summary
 
 This quickstart should provides a good overview of some of the core concepts of the Keycloak Authorization Services, such as
 user-managed access (privacy control) and resource sharing.
+
+API Endpoints
+-----------
+
+Required Scope = scope that is required before this access is permitted
+
+`photoz:user` is granted for anyone with a `keycloak.org` email or logs in from `localhost`
+
+`album:view` is only granted if
++ User is the owner of this resource or
++ User is an admin
+
+`admin:manage` is only granted if this user is an admin
+
+| Method   | Uri             | Required Scope           | Description                                              |
+| ---      | ---             | ---                      | ---                                                      |
+| `GET`    | `/album`        | photoz:user              | List all albums                                          |
+| `POST`   | `/album`        | photoz:user              | Create new album                                         |
+| `GET`    | `/album/shares` | photoz:user              | Get all the albums shared with a user                    |
+| `GET`    | `/profile`      | photoz:user              | Get information about this user (name, number of albums) |
+| `GET`    | `/album/id`     | photoz:user album:view   | View album                                               |
+| `DELETE` | `/album/id`     | photoz:user album:delete | Delete album                                             |
+| `GET`    | `/admin/album`  | photoz:user admin:manage | Get information about all albums, regardless of user     |
