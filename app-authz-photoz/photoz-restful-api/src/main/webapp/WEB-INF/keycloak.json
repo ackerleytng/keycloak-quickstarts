@@ -1,0 +1,65 @@
+{
+  "realm": "photoz",
+  "auth-server-url": "http://localhost:8180/auth/",
+  "ssl-required": "external",
+  "resource": "photoz-restful-api",
+  "verify-token-audience": true,
+  "credentials": {
+    "secret": "secret"
+  },
+  "confidential-port": 0,
+  "policy-enforcer": {
+    "enforcement-mode": "ENFORCING",
+    "paths": [
+      {
+        "path": "/admin/album",
+        "methods": [
+          {
+            "method": "GET",
+            "scopes": ["admin:manage"]
+          }
+        ]
+      },
+      {
+        "path": "/profile",
+        "methods": [
+          {
+            "method": "GET",
+            "scopes": ["photoz:user"]
+          }
+        ]
+      },
+      {
+        "path": "/album",
+        "methods": [
+          {
+            "method": "GET",
+            "scopes": ["photoz:user"]
+          }
+        ]
+      },
+      {
+        "path": "/album/shares",
+        "methods": [
+          {
+            "method": "GET",
+            "scopes": ["photoz:user"]
+          }
+        ]
+      },
+      {
+        "path": "/album/{id}",
+        "methods": [
+          {
+            "method": "GET",
+            "scopes": ["album:view"]
+          },
+          {
+            "method": "DELETE",
+            "scopes": ["album:delete"]
+          }
+        ]
+      }
+    ]
+  }
+}
