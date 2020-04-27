@@ -110,34 +110,53 @@
     {
       "clientId": "photoz-html5-client",
       "enabled": true,
-      "adminUrl": "http://localhost:8080/photoz-html5-client",
-      "baseUrl": "http://localhost:8080/photoz-html5-client",
+      "adminUrl": "https://photoz.localhost/photoz-html5-client",
+      "baseUrl": "https://photoz.localhost/photoz-html5-client",
       "publicClient": true,
       "consentRequired" : true,
       "fullScopeAllowed" : true,
       "redirectUris": [
-        "http://localhost:8080/photoz-html5-client/*"
+        "https://photoz.localhost/photoz-html5-client/*"
       ],
-      "webOrigins": ["http://localhost:8080"]
+      "webOrigins": ["https://photoz.localhost"]
     },
     {
       "clientId": "photoz-restful-api",
       "secret": "secret",
       "enabled": true,
-      "baseUrl": "http://localhost:8080/photoz-restful-api",
+      "baseUrl": "https://photoz.localhost/photoz-restful-api",
       "authorizationServicesEnabled" : true,
       "redirectUris": [
-        "http://localhost:8080/photoz-html5-client"
+        "https://photoz.localhost/photoz-html5-client"
       ],
-      "webOrigins" : ["http://localhost:8080"],
+      "webOrigins": ["https://photoz.localhost"],
       "authorizationSettings": {
         "allowRemoteResourceManagement": true,
         "policyEnforcementMode": "ENFORCING",
         "resources": [
           {
+            "name": "Album Resource",
+            "type": "http://photoz.com/album",
+            "displayName": "Album Resource",
+            "uris": [
+              "/album/*"
+            ],
+            "scopes": [
+              {
+                "name": "album:view"
+              },
+              {
+                "name": "album:delete"
+              }
+            ]
+          },
+          {
             "name": "Admin Resources",
-            "uri": "/admin/*",
             "type": "http://photoz.com/admin",
+            "displayName": "/admin/*",
+            "uris": [
+              "/admin/*"
+            ],
             "scopes": [
               {
                 "name": "admin:manage"
@@ -146,62 +165,42 @@
           },
           {
             "name": "User Profile Resource",
-            "uri": "/profile",
             "type": "http://photoz.com/profile",
+            "displayName": "User Profile Resource",
+            "uris": [
+              "/profile"
+            ],
             "scopes": [
               {
                 "name": "profile:view"
-              }
-            ]
-          },
-          {
-            "name": "Album Resource",
-            "uri": "/album/*",
-            "type": "http://photoz.com/album",
-            "scopes": [
-              {
-                "name": "album:delete"
-              },
-              {
-                "name": "album:view"
               }
             ]
           }
         ],
         "policies": [
           {
-            "name": "Only Owner and Administrators Policy",
-            "description": "Defines that only the resource owner and administrators can do something",
-            "type": "aggregate",
-            "logic": "POSITIVE",
-            "decisionStrategy": "AFFIRMATIVE",
-            "config": {
-              "applyPolicies": "[\"Administration Policy\",\"Only Owner Policy\"]"
-            }
-          },
-          {
-            "name": "Administration Policy",
-            "description": "Defines that only administrators from a specific network address can do something.",
-            "type": "aggregate",
-            "logic": "POSITIVE",
-            "decisionStrategy": "UNANIMOUS",
-            "config": {
-              "applyPolicies": "[\"Any Admin Policy\",\"Only From a Specific Client Address\"]"
-            }
-          },
-          {
             "name": "Only From @keycloak.org or Admin",
             "description": "Defines that only users from @keycloak.org or Admins can do something",
-            "type": "script-only-from-specific-client-address.js",
+            "type": "script-only-keycloak-domain-or-admin.js",
             "logic": "POSITIVE",
-            "decisionStrategy": "UNANIMOUS"
+            "decisionStrategy": "UNANIMOUS",
+            "config": {}
           },
           {
             "name": "Only Owner Policy",
             "description": "Defines that only the resource owner is allowed to do something",
             "type": "script-only-owner.js",
             "logic": "POSITIVE",
-            "decisionStrategy": "UNANIMOUS"
+            "decisionStrategy": "UNANIMOUS",
+            "config": {}
+          },
+          {
+            "name": "Only From a Specific Client Address",
+            "description": "Defines that only clients from a specific address can do something",
+            "type": "script-only-from-specific-client-address.js",
+            "logic": "POSITIVE",
+            "decisionStrategy": "UNANIMOUS",
+            "config": {}
           },
           {
             "name": "Any Admin Policy",
@@ -210,15 +209,8 @@
             "logic": "POSITIVE",
             "decisionStrategy": "UNANIMOUS",
             "config": {
-              "roles": "[{\"id\":\"admin\",\"required\":true}]"
+              "roles": "[{\"id\":\"admin\",\"required\":false}]"
             }
-          },
-          {
-            "name": "Only From a Specific Client Address",
-            "description": "Defines that only clients from a specific address can do something",
-            "type": "script-only-keycloak-domain-or-admin.js",
-            "logic": "POSITIVE",
-            "decisionStrategy": "UNANIMOUS"
           },
           {
             "name": "Any User Policy",
@@ -231,6 +223,26 @@
             }
           },
           {
+            "name": "Administration Policy",
+            "description": "Defines that only administrators from a specific network address can do something.",
+            "type": "aggregate",
+            "logic": "POSITIVE",
+            "decisionStrategy": "UNANIMOUS",
+            "config": {
+              "applyPolicies": "[\"Only From a Specific Client Address\",\"Any Admin Policy\"]"
+            }
+          },
+          {
+            "name": "Only Owner and Any Admin Policy",
+            "description": "Defines that only the resource owner and administrators can do something",
+            "type": "aggregate",
+            "logic": "POSITIVE",
+            "decisionStrategy": "AFFIRMATIVE",
+            "config": {
+              "applyPolicies": "[\"Only Owner Policy\",\"Any Admin Policy\"]"
+            }
+          },
+          {
             "name": "Admin Resource Permission",
             "description": "General policy for any administrative resource.",
             "type": "resource",
@@ -238,8 +250,7 @@
             "decisionStrategy": "UNANIMOUS",
             "config": {
               "defaultResourceType": "http://photoz.com/admin",
-              "applyPolicies": "[\"Administration Policy\"]",
-              "default": "true"
+              "applyPolicies": "[\"Any Admin Policy\"]"
             }
           },
           {
@@ -251,7 +262,7 @@
             "config": {
               "resources": "[\"Album Resource\"]",
               "scopes": "[\"album:view\",\"album:delete\"]",
-              "applyPolicies": "[\"Only Owner and Administrators Policy\"]"
+              "applyPolicies": "[\"Only Owner and Any Admin Policy\"]"
             }
           },
           {
@@ -265,7 +276,22 @@
               "applyPolicies": "[\"Only From @keycloak.org or Admin\"]"
             }
           }
-        ]
+        ],
+        "scopes": [
+          {
+            "name": "admin:manage"
+          },
+          {
+            "name": "album:delete"
+          },
+          {
+            "name": "album:view"
+          },
+          {
+            "name": "profile:view"
+          }
+        ],
+        "decisionStrategy": "AFFIRMATIVE"
       }
     }
   ]

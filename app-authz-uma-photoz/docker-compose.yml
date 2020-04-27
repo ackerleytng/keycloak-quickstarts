@@ -1,0 +1,66 @@
+version: "3"
+
+services:
+  caddy:
+    image: caddy:alpine
+    container_name: caddy
+    volumes:
+      - ./compose/caddy/Caddyfile:/tmp/Caddyfile:ro
+    ports:
+      - 80:80
+      - 443:443
+    entrypoint: caddy run --environ --adapter caddyfile --config /tmp/Caddyfile
+    networks:
+      default:
+        aliases:
+          - keycloak.localhost
+          - photoz.localhost
+
+  keycloak:
+    image: jboss/keycloak:9.0.3
+    container_name: keycloak
+    depends_on:
+      - caddy
+    volumes:
+      - keycloak-deployments:/opt/jboss/keycloak/standalone/deployments
+    environment:
+      DB_VENDOR: POSTGRES
+      DB_ADDR: keycloak-postgres
+      DB_DATABASE: keycloak
+      DB_USER: keycloak
+      DB_SCHEMA: public
+      DB_PASSWORD: password
+      KEYCLOAK_USER: admin
+      KEYCLOAK_PASSWORD: password
+      PROXY_ADDRESS_FORWARDING: "true"
+      KEYCLOAK_HOME: /opt/jboss/keycloak
+
+  keycloak-postgres:
+    image: postgres:12
+    container_name: keycloak-postgres
+    volumes:
+      - keycloak-postgres:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: keycloak
+      POSTGRES_USER: keycloak
+      POSTGRES_PASSWORD: password
+
+  photoz:
+    image: jboss/wildfly:10.1.0.Final
+    container_name: photoz
+    volumes:
+      # Need to mount ../ because the pom.xml in this quickstart refers to ../pom.xml
+      - ../:/src/
+      # Allow easy deployment into keycloak container
+      - keycloak-deployments:/keycloak-deployments
+      - photoz-persistence:/opt/jboss
+    environment:
+      WILDFLY_HOME: /opt/jboss/wildfly
+      PATH: /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/jboss/apache-maven-3.6.3/bin
+    depends_on:
+      - caddy
+
+volumes:
+  keycloak-postgres:
+  keycloak-deployments:
+  photoz-persistence:

@@ -1,11 +1,11 @@
 app-authz-uma-photoz: HTML5 + AngularJS client application that interacts with a protected RESTFul API
 ================================================
 
-Level: Intermediate  
-Technologies: JAX-RS, HTML5, AngularJS  
-Summary: AngularJS client application that accesses a protected RESTFul API based on JAX-RS  
+Level: Intermediate
+Technologies: JAX-RS, HTML5, AngularJS
+Summary: AngularJS client application that accesses a protected RESTFul API based on JAX-RS
 Target Product: <span>Keycloak</span>, <span>WildFly</span>
-Source: <https://github.com/keycloak/keycloak-quickstarts>  
+Source: <https://github.com/keycloak/keycloak-quickstarts>
 
 What is it?
 -----------
@@ -15,11 +15,11 @@ access to resources (in this case photo albums and user profiles). It consists o
 + *AngularJS* + *JAX-RS* that will introduce the reader to some of the main concepts around Keycloak Authorization Services.
 
 Basically, it is a project containing three modules:
- 
+
 * **photoz-restful-api**, a simple RESTFul API based on JAX-RS and acting as a resource server.
 * **photoz-html5-client**, a HTML5 + AngularJS client that will consume the RESTful API published by a resource server.
 
-For this application, users can be regular users or administrators. Regular users can create/view/delete their albums 
+For this application, users can be regular users or administrators. Regular users can create/view/delete their albums
 and administrators can do anything. Regular users are also allowed to share their albums with other users.
 
 In Keycloak, albums and the user profile are resources that must be protected based on a set of policies that defines the
@@ -36,7 +36,7 @@ The authorization requirements for this quickstart are based on the following as
 
 * By default, any regular user can perform any operation on his resources.
 
-    * For instance, Alice can create, view and delete her own albums. 
+    * For instance, Alice can create, view and delete her own albums.
 
 * Authorization for viewing and deleting albums can be granted by the owner to other users.
 
@@ -44,7 +44,7 @@ The authorization requirements for this quickstart are based on the following as
 
 * Administrators can view albums from all users (via Administration API) and can also delete any album.
 
-* Regular users can only view their own profiles. The profile contains information such as the user id and number of albums 
+* Regular users can only view their own profiles. The profile contains information such as the user id and number of albums
   created.
 
 * Administrators are only authorized to access resources if the client's ip address is well known
@@ -53,7 +53,7 @@ That said, this quickstart will show you how to use the Keycloak to define polic
 
 * Role-based Access Control
 * Attribute-based Access Control
-* Rule-based policies using JavaScript 
+* Rule-based policies using JavaScript
 
 This quickstart demonstrates how to enable User-Managed Access (UMA) in an application in order to allow users to manage access
 to their resources using the *Keycloak Account Service*. It also shows how to create resources dynamically and how to
@@ -62,13 +62,51 @@ owner is the authenticated user.
 
 In addition it provides some background on how one can actually protect JAX-RS endpoints using a *policy enforcer*.
 
+Scripted Quickstart
+-----------
+
+```
+docker-compose up -d
+```
+
+When everything is up (look at `docker-compose logs -f`), run
+
+```
+docker-compose exec photoz /src/app-authz-uma-photoz/compose/photoz/install-keycloak-adapter.sh
+docker-compose restart photoz
+docker-compose exec photoz /src/app-authz-uma-photoz/compose/photoz/start.sh
+docker-compose exec --user root photoz /src/app-authz-uma-photoz/compose/photoz/install-keycloak-cert.sh
+```
+
+Restart photoz, because after a cert is added to the JVM, the JVM has to be restarted
+
+```
+docker-compose restart photoz
+```
+
+Open a browser and browse to
+
+```
+https://keycloak.localhost/
+```
+
+Log in with `admin` and `password` and then click "Add Realm", select "Import" and then import `./photoz-realm.json`.
+
+Then, browse to
+
+```
+https://photoz.localhost/photoz-html5-client/
+```
+
+Then proceed to [Creating and Sharing Resources](#creating-and-sharing-resources) below!
+
 Create the Example Realm and a Resource Server
 -----------
 
 Build the quickstart by running the following command:
 
    ````
-   mvn clean install 
+   mvn clean install
    ````
 
 This quickstart defines some policies using JavaScript. Before creating the realm, you need to deploy these policies to the Keycloak Server as follows:
@@ -92,8 +130,8 @@ Now, log in to the Keycloak Administration Console and create a new realm based 
    ````
    keycloak-quickstarts/app-authz-uma-photoz/photoz-realm.json
    ````
-    
-That will import a pre-configured realm with everything you need to run this quickstart. For more details about how to import a realm 
+
+That will import a pre-configured realm with everything you need to run this quickstart. For more details about how to import a realm
 into Keycloak, check the Keycloak's reference documentation.
 
 After importing that file, you'll have a new realm called `photoz`.
@@ -126,12 +164,12 @@ The next step is to the deploy the `photoz-restful-api` application:
    ````
    cd photoz-restful-api
    ````
-   
+
 3. Deploy the RESTFul application:
 
    ````
    mvn clean package wildfly:deploy
-   ```` 
+   ````
 
 Now, try to access the client application using the following URL:
 
@@ -163,7 +201,7 @@ a table. Let's now share the albums with John Doe (jdoe):
 
 * Click on the `Italy Vacations` album. In the `Share with others` section fill the input field with the `jdoe` username
 and click on the `Share` button. By default both the `album:view` and `album:delete` scopes are set as permissions for
-John. 
+John.
 * The table at the top of the page now displays information about the shared album: the username with which the album was
 shared with, the permissions (scopes) this username has on the resource, the time and date of the permission grat and a
 `Revoke` buttom that Alice can use at any time to revoke access to her album.
